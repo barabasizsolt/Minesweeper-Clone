@@ -1,11 +1,10 @@
-#include "mainwindow.h"
-
+#include "grid.h"
 #include <QApplication>
 
 int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
-    MainWindow w;
+    Grid w;
     w.show();
     return a.exec();
 }
