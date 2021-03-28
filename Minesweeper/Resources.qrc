@@ -1,0 +1,11 @@
+<RCC>
+    <qresource prefix="/images">
+        <file>injured_emoji.png</file>
+        <file>mine.png</file>
+        <file>flag.png</file>
+        <file>smile_emoji.png</file>
+        <file>wrong.png</file>
+        <file>mine2.png</file>
+        <file>trs.png</file>
+    </qresource>
+</RCC>
