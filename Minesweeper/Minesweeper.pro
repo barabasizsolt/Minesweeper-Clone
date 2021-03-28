@@ -11,12 +11,14 @@ CONFIG += c++11
 SOURCES += \
     custombutton.cpp \
     digitalclock.cpp \
+    flaglcd.cpp \
     grid.cpp \
     main.cpp
 
 HEADERS += \
     custombutton.h \
     digitalclock.h \
+    flaglcd.h \
     grid.h
 
 FORMS +=

@@ -18,6 +18,7 @@
 #include <QMessageBox>
 #include "custombutton.h"
 #include "digitalclock.h"
+#include "flaglcd.h"
 
 class Grid : public QWidget
 {
@@ -62,6 +63,7 @@ private:
     QMap <int,QString> numberColors;
     DigitalClock * clock;
     QPushButton * restartButton;
+    FlagLCD * flagLcd;
 };
 
 #endif // GRID_H

@@ -82,6 +82,8 @@ void Grid::restartGame(){
 
     clock->resetTimer();
     clock->startTimer();
+
+    flagLcd->setValue(totalBombs);
 }
 
 void Grid::gameOver(){
@@ -94,6 +96,14 @@ void Grid::gameOver(){
 
 void Grid::gameWon(){
     QMessageBox::about(this, "Hurra!", "You won the game!");
+
+    //Lehet flaggel kene jelezni a bombakat.
+    for (int i = 0; i < gridLayout->count(); ++i){
+      QWidget *widget = gridLayout->itemAt(i)->widget();
+      if(widget != NULL){
+          widget->setEnabled(false);
+      }
+    }
 }
 
 int Grid::remainedPositions(){
@@ -121,10 +131,12 @@ void Grid::placeFlags(){
             visisted[x][y] = true;
             btn->setIcon(bt1);
             btn->setIconSize(p1.rect().size() / 12);
+            flagLcd->decrement();
         }
         else if(!btn->icon().isNull()){
             visisted[x][y] = false;
             btn->setIcon(QIcon());
+            flagLcd->increment();
         }
     }
 }
@@ -258,9 +270,11 @@ void Grid::setupUI(){
     mainLayout = new QVBoxLayout();
     clock = new DigitalClock();
     restartButton = new QPushButton();
-    restartButton->setFixedSize(45,45);
+    restartButton->setFixedSize(50,50);
     restartButton->setIcon(btnIcon);
     restartButton->setIconSize(pixmap.rect().size() / 5);
+    flagLcd = new FlagLCD;
+    flagLcd->setValue(totalBombs);
 
     for(int i = 0; i < mRows; i++){
         for(int j = 0; j < mCols; j++){
@@ -275,6 +289,7 @@ void Grid::setupUI(){
         }
     }
 
+    headerLayout->addWidget(flagLcd);
     headerLayout->addWidget(restartButton);
     headerLayout->addWidget(clock);
 
