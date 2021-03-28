@@ -34,10 +34,12 @@ void DigitalClock::showTime(){
 
 void DigitalClock::stopTimer(){
     timer->stop();
-    //currTime = time.toString("s");
-    //QMessageBox::about(this, "Your time!", currTime);
 }
 
 void DigitalClock::startTimer(){
     timer->start();
+}
+
+void DigitalClock::resetTimer(){
+    time = QTime(0, 0, 0);
 }

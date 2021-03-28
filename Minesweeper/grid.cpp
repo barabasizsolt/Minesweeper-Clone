@@ -45,16 +45,51 @@ void Grid::gameStatus(){
         dfs(x,y);
 
         int rPoz = remainedPositions();
-        qDebug() << "rPoz: " << rPoz;
         if(rPoz == totalBombs){
             emit wonTheGame();
         }
     }
 }
 
+void Grid::restartGame(){
+    QPixmap pixmap(":/images/smile_emoji.png");
+    QIcon btnIcon(pixmap);
+    restartButton->setIcon(btnIcon);
+
+    for(int i = 0; i < mRows; i++){
+        for(int j = 0; j < mCols; j++){
+            grid[i][j] = 0;
+            visisted[i][j] = false;
+        }
+    }
+
+    generateRandom();
+
+    for (int i = 0; i < gridLayout->count(); ++i){
+      QWidget *widget = gridLayout->itemAt(i)->widget();
+      CustomButton* btn = qobject_cast<CustomButton*>(widget);
+      if(btn != NULL){
+          btn->setEnabled(true);
+          btn->setStyleSheet("CustomButton {background-color: None;}");
+          if(!btn->icon().isNull()){
+            btn->setIcon(QIcon());
+          }
+          if(!btn->text().isEmpty()){
+            btn->setText("");
+          }
+      }
+    }
+
+    clock->resetTimer();
+    clock->startTimer();
+}
+
 void Grid::gameOver(){
     showBombs();
     clock->stopTimer();
+    QPixmap pixmap(":/images/injured_emoji.png");
+    QIcon btnIcon(pixmap);
+    restartButton->setIcon(btnIcon);
 }
 
 void Grid::gameWon(){
@@ -97,7 +132,7 @@ void Grid::placeFlags(){
 void Grid::generateRandom(){
     int ctr = 1;
     while(true){
-        if(ctr > 10){
+        if(ctr > totalBombs){
             break;
         }
         quint32 x = QRandomGenerator::global()->bounded(0, mCols);
@@ -200,6 +235,9 @@ void Grid::showBombs(){
 }
 
 void Grid::setupUI(){
+    QPixmap pixmap(":/images/smile_emoji.png");
+    QIcon btnIcon(pixmap);
+
     QFont font;
     font.setWeight(QFont::ExtraBold);
     font.setPixelSize(23);
@@ -213,7 +251,7 @@ void Grid::setupUI(){
     numberColors.insert(7, "CustomButton {color: black;}");
     numberColors.insert(8, "CustomButton {color: gray;}");
 
-    setFixedSize(430,520);
+    setFixedSize(430,500);
 
     headerLayout = new QHBoxLayout();
     gridLayout = new QGridLayout();
@@ -221,6 +259,8 @@ void Grid::setupUI(){
     clock = new DigitalClock();
     restartButton = new QPushButton();
     restartButton->setFixedSize(45,45);
+    restartButton->setIcon(btnIcon);
+    restartButton->setIconSize(pixmap.rect().size() / 5);
 
     for(int i = 0; i < mRows; i++){
         for(int j = 0; j < mCols; j++){
@@ -245,4 +285,5 @@ void Grid::setupUI(){
 
     connect(this, SIGNAL(lostTheGame()), this, SLOT(gameOver()));
     connect(this, SIGNAL(wonTheGame()), this, SLOT(gameWon()));
+    connect(restartButton, SIGNAL(clicked()), this, SLOT(restartGame()));
 }

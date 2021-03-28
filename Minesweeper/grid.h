@@ -27,6 +27,7 @@ public:
 
 public slots:
     void gameStatus();
+    void restartGame();
     void gameOver();
     void gameWon();
     int remainedPositions();

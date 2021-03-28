@@ -21,6 +21,7 @@ private slots:
 public slots:
     void stopTimer();
     void startTimer();
+    void resetTimer();
 
 private:
     QTimer * timer;
