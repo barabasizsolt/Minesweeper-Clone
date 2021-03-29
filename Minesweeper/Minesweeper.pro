@@ -13,13 +13,15 @@ SOURCES += \
     digitalclock.cpp \
     flaglcd.cpp \
     grid.cpp \
-    main.cpp
+    main.cpp \
+    utils.cpp
 
 HEADERS += \
     custombutton.h \
     digitalclock.h \
     flaglcd.h \
-    grid.h
+    grid.h \
+    utils.h
 
 FORMS +=
 

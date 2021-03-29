@@ -6,30 +6,18 @@ DigitalClock::DigitalClock(QWidget *parent)
 {
 
     timer = new QTimer(this);
-    time = QTime(0, 0, 0);
-    timer->setInterval(5);
+    timer->setInterval(1000);
 
     connect(timer, &QTimer::timeout, this, &DigitalClock::showTime);
-    timer->start();
 }
 
-DigitalClock::~DigitalClock(){
-    delete timer;
-}
-
-QString DigitalClock::getCurrTime(){
-    return this->currTime;
+int DigitalClock::getTime(){
+    return counter;
 }
 
 void DigitalClock::showTime(){
-    QTime t = time.addMSecs(5);
-    if(t.second() == 999){
-        time = QTime(0, 0, 0);
-    }
-    else{
-        time = t;
-    }
-    display(t.toString("ss"));
+    counter += 1;
+    display(counter);
 }
 
 void DigitalClock::stopTimer(){
@@ -41,5 +29,7 @@ void DigitalClock::startTimer(){
 }
 
 void DigitalClock::resetTimer(){
-    time = QTime(0, 0, 0);
+    counter = 0;
+    stopTimer();
+    display(counter);
 }

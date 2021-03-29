@@ -9,16 +9,14 @@
 #include <QGenericMatrix>
 #include <QPushButton>
 #include <QMouseEvent>
-#include <QList>
 #include <QRandomGenerator>
-#include <vector>
 #include <QMap>
-#include <QPixmap>
-#include <QIcon>
 #include <QMessageBox>
 #include "custombutton.h"
 #include "digitalclock.h"
 #include "flaglcd.h"
+#include "utils.h"
+#include <vector>
 
 class Grid : public QWidget
 {
@@ -46,10 +44,10 @@ private:
     bool isSafe(int x, int y);
     bool isMine(int x, int y);
     void printGrid();
-    void showBombs();
+    void setPlayGround(bool isOver);
 
-    int ** grid;
-    bool ** visisted;
+    std::vector<std::vector<int>> grid;
+    std::vector<std::vector<int>> visisted;
     int mRows;
     int mCols;
     int totalBombs;
@@ -60,10 +58,10 @@ private:
     QHBoxLayout * headerLayout;
     QGridLayout * gridLayout;
     QVBoxLayout * mainLayout;
-    QMap <int,QString> numberColors;
     DigitalClock * clock;
     QPushButton * restartButton;
     FlagLCD * flagLcd;
+    Utils utils;
 };
 
 #endif // GRID_H

@@ -13,8 +13,8 @@ class DigitalClock : public QLCDNumber
 
 public:
     DigitalClock(QWidget *parent = nullptr);
-    ~DigitalClock();
-    QString getCurrTime();
+    virtual ~DigitalClock() { delete timer; };
+    int getTime();
 
 private slots:
     void showTime();
@@ -25,8 +25,7 @@ public slots:
 
 private:
     QTimer * timer;
-    QTime time;
-    QString currTime;
+    int counter = 0;
 };
 
 #endif // DIGITALCLOCK_H
