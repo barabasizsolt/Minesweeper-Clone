@@ -20,17 +20,15 @@ Grid::Grid(QWidget*parent, int rows, int columns, int bombs)
 }
 
 void Grid::gameStatus(){
-    auto btn = qobject_cast<CustomButton*>(sender());
+    auto button = qobject_cast<CustomButton*>(sender());
     clock->startTimer();
 
-    if( btn != NULL ) {
-        if(!btn->icon().isNull()){
+    if( button != NULL ) {
+        if(!button->icon().isNull()){
             return;
         }
-        const int index = gridLayout->indexOf(btn);
-        int x,y,z;
-        gridLayout->getItemPosition(index,&x,&y,&z,&z);
-        dfs(x,y);
+        Position position = utils.getCurrentPosition(button, gridLayout);
+        dfs(position.x, position.y);
         if(remainedPositions() == totalBombs){
             emit wonTheGame();
         }
@@ -54,7 +52,7 @@ void Grid::restartGame(){
       auto btn = qobject_cast<CustomButton*>(widget);
       if(btn != NULL){
          btn->setEnabled(true);
-         btn->setStyleSheet("CustomButton {background-color:#c4bbf0;border:3px outset #999;}");
+         btn->setStyleSheet("CustomButton {background-color:#c4bbf0;border:3px outset #999}");
 
          if(!btn->icon().isNull()){
             btn->setIcon(QIcon());
@@ -67,37 +65,34 @@ void Grid::restartGame(){
 
     flagLcd->setValue(totalBombs);
     clock->resetTimer();
-
     printGrid();
 }
 
 int Grid::remainedPositions(){
-    int ctr = 0;
+    int counter = 0;
     for (int i = 0; i < gridLayout->count(); ++i){
-      auto widget = gridLayout->itemAt(i)->widget();
-      if(widget != NULL && widget->isEnabled()){
-          ctr++;
-      }
+        auto widget = gridLayout->itemAt(i)->widget();
+        if(widget != NULL && widget->isEnabled()){
+              counter++;
+        }
     }
-    return ctr;
+    return counter;
 }
 
 void Grid::placeFlags(){
-    CustomButton* btn = qobject_cast<CustomButton*>(sender());
-    if( btn != NULL ) {
-        const int index = gridLayout->indexOf(btn);
-        int x,y,_;
-        gridLayout->getItemPosition(index,&x,&y,&_,&_);
+    CustomButton* button = qobject_cast<CustomButton*>(sender());
+    if( button != NULL ) {
+        Position position = utils.getCurrentPosition(button, gridLayout);
 
-        if(btn->icon().isNull()){
-            visisted[x][y] = true;
-            btn->setIcon(*utils.getFlagIcon());
-            btn->setIconSize((*utils.getFlagPixmap()).rect().size() / 12);
+        if(button->icon().isNull()){
+            visisted[position.x][position.y] = true;
+            button->setIcon(*utils.getFlagIcon());
+            button->setIconSize((*utils.getFlagPixmap()).rect().size() / 12);
             flagLcd->decrement();
         }
-        else if(!btn->icon().isNull()){
-            visisted[x][y] = false;
-            btn->setIcon(QIcon());
+        else if(!button->icon().isNull()){
+            visisted[position.x][position.y] = false;
+            button->setIcon(QIcon());
             flagLcd->increment();
         }
     }
@@ -111,42 +106,43 @@ void Grid::gameOver(){
 
 void Grid::gameWon(){
     clock->stopTimer();
-    QMessageBox::about(this, "Hurra!", "You won the game!\nYour time: " + QString::number(clock->getTime()));
+    //QMessageBox::about(this, "Hurra!", "You won the game!\nYour time: " + QString::number(clock->getTime()));
     setPlayGround(false);
+    restartButton->setIcon(*utils.getSunglassIcon());
 }
 
 void Grid::setPlayGround(bool isOver){
 for (int i = 0; i < gridLayout->count(); ++i){
     auto widget = gridLayout->itemAt(i)->widget();
     if(widget != NULL){
-      widget->setEnabled(false);
-      auto btn = qobject_cast<CustomButton*>(widget);
-      const int index = gridLayout->indexOf(btn);
-      int x,y,_;
-      gridLayout->getItemPosition(index,&x,&y,&_,&_);
-      if(grid[x][y] == 9){
-          if(isOver){
-              btn->setIcon(*utils.getMineIcon());
-              btn->setIconSize((*utils.getMinePixmap()).rect().size() / 20);
-              btn->setStyleSheet("CustomButton {background-color:red;}");
-          }
-          else{
-              btn->setIcon(*utils.getFlagIcon());
-              btn->setStyleSheet("CustomButton {background-color:green;}");
-          }
+        widget->setEnabled(false);
+        auto button = qobject_cast<CustomButton*>(widget);
+        Position position = utils.getCurrentPosition(button, gridLayout);
+        if(grid[position.x][position.y] == 9){
+            if(isOver){
+                button->setIcon(*utils.getMineIcon());
+                button->setIconSize((*utils.getMinePixmap()).rect().size() / 20);
+                button->setStyleSheet("CustomButton {background-color:red}");
+        }
+        else{
+            button->setIcon(*utils.getFlagIcon());
+            button->setStyleSheet("CustomButton {background-color:green}");
+        }
       }
     }
   }
 }
 
 void Grid::generateRandom(){
+    srand((unsigned)time(0));
+
     int ctr = 1;
     while(true){
         if(ctr > totalBombs){
             break;
         }
-        quint32 x = QRandomGenerator::global()->bounded(0, mCols);
-        quint32 y = QRandomGenerator::global()->bounded(0, mCols);
+        int x = rand() % mRows;
+        int y = rand() % mCols;
         if(grid[x][y] == 0){
             grid[x][y] = 9;
             ctr++;
@@ -156,24 +152,23 @@ void Grid::generateRandom(){
 
 void Grid::dfs(int x, int y){
     if(grid[x][y] == 9){
-        qDebug() << "Bomba!" <<"\n";
         emit lostTheGame();
         return;
     }
     else{
-        int ctr = countMines(x,y);
+        int mines = countMines(x,y);
         auto item = gridLayout->itemAtPosition(x, y);
         auto widget = item->widget();
         auto button = dynamic_cast<CustomButton*>(widget);
-        if(ctr != 0){
-            button->setText(QString::number(ctr));
+        if(mines != 0){
+            button->setText(QString::number(mines));
         }
         button->setStyleSheet("CustomButton {border:1px outset #FFF; background-color:#927fbf;"
-                            + utils.getColors(ctr) + "}");
+                            + utils.getColors(mines));
         visisted[x][y] = true;
         button->setEnabled(false);
 
-        if(ctr == 0){
+        if(mines == 0){
             for(int i = 0; i < 8; i++){
                 if(isSafe(x + cordX[i], y + cordY[i]) && !visisted[x + cordX[i]][y + cordY[i]]){
                     if(!isMine(x + cordX[i], y + cordY[i])){
@@ -187,15 +182,15 @@ void Grid::dfs(int x, int y){
 }
 
 int Grid::countMines(int x, int y){
-    int ctr = 0;
+    int counter = 0;
     for(int i = 0; i < 8; i++){
         if(isSafe(x + cordX[i], y + cordY[i])){
             if(isMine(x + cordX[i], y + cordY[i])){
-                ctr++;
+                counter++;
             }
         }
     }
-    return ctr;
+    return counter;
 }
 
 bool Grid::isSafe(int x, int y){
@@ -211,18 +206,18 @@ void Grid::setupUI(){
     font.setWeight(QFont::ExtraBold);
     font.setPixelSize(23);
 
-    //setFixedSize(290,340);
-    setFixedSize(490,540);
+    setFixedSize(290,340);
+    //setFixedSize(490,540);
     //setFixedSize(900,540);
 
-    headerLayout = new QHBoxLayout();
-    gridLayout = new QGridLayout();
-    mainLayout = new QVBoxLayout();
+    headerLayout = new QHBoxLayout;
+    gridLayout = new QGridLayout;
+    mainLayout = new QVBoxLayout;
 
-    clock = new DigitalClock();
-    clock->setStyleSheet("DigitalClock {color:white; background-color:#927fbf;}");
+    clock = new DigitalClock;
+    clock->setStyleSheet("DigitalClock {color:white; background-color:#927fbf}");
 
-    restartButton = new QPushButton();
+    restartButton = new QPushButton;
     restartButton->setFixedSize(50,50);
     restartButton->setIcon(*utils.getSmilyeIcon());
     restartButton->setIconSize((*utils.getSmileyPixmap()).rect().size() / 5);
@@ -230,14 +225,14 @@ void Grid::setupUI(){
 
     flagLcd = new FlagLCD;
     flagLcd->setValue(totalBombs);
-    flagLcd->setStyleSheet("FlagLCD {color:white; background-color:#927fbf;}");
+    flagLcd->setStyleSheet("FlagLCD {color:white; background-color:#927fbf}");
 
     for(int i = 0; i < mRows; i++){
         for(int j = 0; j < mCols; j++){
-            CustomButton*button = new CustomButton();
+            CustomButton*button = new CustomButton;
             button->setFixedSize(30,30);
             button->setFont(font);
-            button->setStyleSheet("CustomButton {background-color:#c4bbf0; border:3px outset #999;}");
+            button->setStyleSheet("CustomButton {background-color:#c4bbf0; border:3px outset #999}");
 
             gridLayout->addWidget(button, i, j);
             connect(button, SIGNAL(leftClicked()), this, SLOT(gameStatus()));
@@ -255,7 +250,7 @@ void Grid::setupUI(){
     mainLayout->addLayout(headerLayout);
     mainLayout->addLayout(gridLayout);
     setLayout(mainLayout);
-    setStyleSheet("Grid {background-color:#4f3b78;}");
+    setStyleSheet("Grid {background-color:#4f3b78}");
 
     connect(this, SIGNAL(lostTheGame()), this, SLOT(gameOver()));
     connect(this, SIGNAL(wonTheGame()), this, SLOT(gameWon()));

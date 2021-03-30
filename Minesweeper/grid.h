@@ -17,6 +17,8 @@
 #include "flaglcd.h"
 #include "utils.h"
 #include <vector>
+#include <cstdlib>
+#include <ctime>
 
 class Grid : public QWidget
 {

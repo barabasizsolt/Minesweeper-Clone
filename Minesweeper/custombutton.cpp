@@ -2,10 +2,7 @@
 #include "custombutton.h"
 
 CustomButton::CustomButton(QWidget *parent):
-    QPushButton(parent)
-{
-
-}
+    QPushButton(parent){}
 
 void CustomButton::mousePressEvent(QMouseEvent *e){
     if(e->button() == Qt::RightButton){

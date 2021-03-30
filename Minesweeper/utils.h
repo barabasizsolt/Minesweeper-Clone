@@ -4,9 +4,16 @@
 #include <QPixmap>
 #include <QIcon>
 #include <QMap>
+#include <QGridLayout>
+#include "custombutton.h"
 
-class Utils
-{
+struct Position{
+    int x;
+    int y;
+};
+
+class Utils{
+
 public:
     Utils();
     ~Utils();
@@ -14,11 +21,15 @@ public:
     QIcon* getInjuredIcon();
     QIcon* getMineIcon();
     QIcon* getSmilyeIcon();
+    QPixmap *getSunglassIcon();
     QPixmap* getFlagPixmap();
     QPixmap* getInjuredPixmap();
     QPixmap* getMinePixmap();
     QPixmap* getSmileyPixmap();
+    QPixmap *getSunglassPixmap();
     QString getColors(int ctr);
+    Position getCurrentPosition(QWidget* widget, QGridLayout* layout);
+
 private:
     QPixmap *flagPixmap;
     QIcon *flagIcon;
@@ -28,6 +39,8 @@ private:
     QIcon *mineIcon;
     QPixmap *smileyPixmap;
     QIcon *smileyIcon;
+    QPixmap *sunglassPixmap;
+    QIcon *sunglassIcon;
     QMap <int, QString> numberColors;
 };
 
