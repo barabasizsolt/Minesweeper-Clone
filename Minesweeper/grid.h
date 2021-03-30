@@ -11,7 +11,6 @@
 #include <QMouseEvent>
 #include <QRandomGenerator>
 #include <QMap>
-#include <QMessageBox>
 #include "custombutton.h"
 #include "digitalclock.h"
 #include "flaglcd.h"

@@ -14,6 +14,7 @@ SOURCES += \
     flaglcd.cpp \
     grid.cpp \
     main.cpp \
+    maingame.cpp \
     utils.cpp
 
 HEADERS += \
@@ -21,6 +22,7 @@ HEADERS += \
     digitalclock.h \
     flaglcd.h \
     grid.h \
+    maingame.h \
     utils.h
 
 FORMS +=
